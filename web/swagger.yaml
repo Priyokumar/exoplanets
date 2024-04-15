@@ -1,0 +1,280 @@
+swagger: "2.0"
+info:
+  description: "Exoplanet API Service"
+  version: 1.0.7
+  title: Exoplanet
+  contact:
+    email: ns.priyo11@gmail.com
+host: localhost:1323
+basePath: "/v1/api"
+tags:
+  - name: exoplanets
+    description: Access to exoplanets
+schemes:
+  - http
+paths:
+  "/exoplanets":
+    get:
+      tags:
+        - exoplanets
+      summary: Returns list exoplanents
+      produces:
+        - application/json
+      parameters:
+        - name: name
+          in: query
+          description: name of exoplanet
+          required: false
+          type: string
+        - name: mass
+          in: query
+          description: distance from earth
+          required: false
+          type: string
+        - name: sortBy
+          in: query
+          required: false
+          type: string
+          enum: ["radius", "mass"]
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            "$ref": "#/definitions/Exoplanets"
+    post:
+      tags:
+        - exoplanets
+      summary: Add an exoplanet
+      description: ""
+      consumes:
+        - application/json
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            "$ref": "#/definitions/ExoplanetDTO"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            "$ref": "#/definitions/Exoplanet"
+        "400":
+          description: Invalid payload
+  "/exoplanets/{id}":
+    get:
+      tags:
+        - exoplanets
+      summary: Find exoplanet by ID
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the exoplanet
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            "$ref": "#/definitions/Exoplanet"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: not found
+    put:
+      tags:
+        - exoplanets
+      summary: Update an exoplanent
+      description: This will update the existing exoplanet by ID
+      parameters:
+        - name: id
+          in: path
+          description: id of the exoplanet
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: body
+          description: exoplanet payload
+          required: true
+          schema:
+            "$ref": "#/definitions/ExoplanetDTO"
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            "$ref": "#/definitions/Exoplanet"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Exoplanet not found
+    delete:
+      tags:
+        - exoplanets
+      summary: Delete exoplanet by ID
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the exoplanet that needs to be deleted
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successfulyl deleted
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: exoplanent not found
+  "/exoplanets/{id}/estimatedfuel":
+    get:
+      tags:
+        - exoplanets
+      summary: Get estimated fuel for a exoplanet for given capacity.
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of the exoplanet
+          required: true
+          type: string
+        - name: capacity
+          in: query
+          description: capacity
+          required: false
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            "$ref": "#/definitions/EstimatedFuelResponse"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: exoplanet not found
+definitions:
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string
+  Category:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+    xml:
+      name: Category
+  Pet:
+    type: object
+    required:
+      - name
+      - photoUrls
+    properties:
+      id:
+        type: integer
+        format: int64
+      category:
+        "$ref": "#/definitions/Category"
+      name:
+        type: string
+        example: doggie
+      photoUrls:
+        type: array
+        xml:
+          wrapped: true
+        items:
+          type: string
+          xml:
+            name: photoUrl
+      tags:
+        type: array
+        xml:
+          wrapped: true
+        items:
+          xml:
+            name: tag
+          "$ref": "#/definitions/Tag"
+      status:
+        type: string
+        description: pet status in the store
+        enum:
+          - available
+          - pending
+          - sold
+    xml:
+      name: Pet
+  Tag:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+    xml:
+      name: Tag
+  Exoplanets:
+    type: array
+    items:
+      "$ref": "#/definitions/Exoplanet"
+
+  Exoplanet:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      description:
+        type: string
+      distance:
+        type: integer
+      mass:
+        type: number
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+  ExoplanetDTO:
+    type: object
+    properties:
+      name:
+        type: string
+        example: Amaze planet
+      description:
+        type: string
+        example: Amaze planet
+      distance:
+        type: integer
+        example: 234
+      radius:
+        type: number
+        example: 5
+      mass:
+        type: number
+        example: 4
+      exoplanetType:
+        type: string
+        example: GasGiant
+  EstimatedFuelResponse:
+    type: object
+    properties:
+      estimatedFuel:
+        type: number
